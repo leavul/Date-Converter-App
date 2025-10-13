@@ -11,7 +11,7 @@ export function ResetDateButton({ onPress }: Props) {
       activeOpacity={0.8}
       onPress={onPress}
     >
-      <Ionicons name="reload-outline" size={18} color="black" />
+      <Ionicons name="reload-outline" size={18} color="000000ff" />
       <Text style={styles.text}>{"Go back to today data"}</Text>
     </TouchableOpacity>
   );
