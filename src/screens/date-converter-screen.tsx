@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { CalendarTypePanel } from "../components/calendar-type-panel";
@@ -34,6 +35,12 @@ export default function DateConverterScreen() {
     calendarTypeIsHijri: calendarTypeIsHijri,
   });
 
+  // If "reset to today or toggle calendar type" button is pressed while the picker wheels are moving,
+  // the pickers won’t respond because of the package behavior.
+  // So, following the package instructions, this value forces the pickers
+  // to reset and show today’s date when something like that issue happens.
+  const [resetSignal, setResetSignal] = useState(0);
+
   // Select year options based on currently chosen calendar type
   const yearOptions = calendarTypeIsHijri
     ? hijriYearOptions
@@ -58,7 +65,12 @@ export default function DateConverterScreen() {
       {/* Calendar type toggle */}
       <CalendarTypePanel
         fromHijriToGregorian={calendarTypeIsHijri}
-        onToggleCalendarTypePress={() => dispatch(toggle_calendar_type())}
+        onToggleCalendarTypePress={() => {
+          dispatch(toggle_calendar_type());
+
+          // Force picker to reset if perhaps the picker wheels are moving
+          setResetSignal((prev) => prev + 1);
+        }}
       />
 
       {/* Date pickers */}
@@ -69,10 +81,16 @@ export default function DateConverterScreen() {
         yearOptions={yearOptions}
         monthOptions={monthOptions}
         dayOptions={dayOptions}
+        resetSignal={resetSignal}
         onChangeDatePart={(part, value) =>
           dispatch(set_date_part({ part, value }))
         }
-        onResetToToday={() => dispatch(resetToToday())}
+        onResetToToday={() => {
+          dispatch(resetToToday());
+
+          // Force picker to reset if perhaps the picker wheels are moving
+          setResetSignal((prev) => prev + 1);
+        }}
       />
 
       {/* Converted date card */}

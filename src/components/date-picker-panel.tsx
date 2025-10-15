@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { CustomWheelPicker } from "./custom-wheel-picker";
 import { ResetDateButton } from "./reset-date-button";
@@ -17,6 +16,7 @@ interface DatePickerPanelProps {
   yearOptions: CustomWheelPickerItem<number>[];
   monthOptions: CustomWheelPickerItem<number>[];
   dayOptions: CustomWheelPickerItem<number>[];
+  resetSignal: number;
   onChangeDatePart: (part: "year" | "month" | "day", value: number) => void;
   onResetToToday: () => void;
 }
@@ -30,15 +30,10 @@ export function DatePickerPanel({
   yearOptions,
   monthOptions,
   dayOptions,
+  resetSignal,
   onChangeDatePart,
   onResetToToday,
 }: DatePickerPanelProps) {
-  // If "reset to today" button is pressed while the picker wheels are moving,
-  // the pickers won’t respond because of the package behavior.
-  // So, following the package instructions, this value forces the pickers
-  // to reset and show today’s date when something like that issue happens.
-  const [resetSignal, setResetSignal] = useState(0);
-
   return (
     <View style={styles.container}>
       <View style={styles.wheelPickersView}>
@@ -75,9 +70,6 @@ export function DatePickerPanel({
         onResetToToday={() => {
           // Reset to today's date
           onResetToToday();
-
-          // Force picker to reset if perhaps the picker wheels are moving
-          setResetSignal((prev) => prev + 1);
         }}
       />
     </View>
