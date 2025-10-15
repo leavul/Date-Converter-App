@@ -1,11 +1,16 @@
 import { StyleSheet, Text, View } from "react-native";
-export function ConvertedDateCard({
-  weekdayName,
-  formattedDate,
-}: {
-  weekdayName: string;
+
+// Props for the converted date card
+interface ConvertedDateCardProps {
   formattedDate: string;
-}) {
+  weekdayName: string;
+}
+
+// Card to display the converted date and its weekday
+export function ConvertedDateCard({
+  formattedDate,
+  weekdayName,
+}: ConvertedDateCardProps) {
   return (
     <View style={styles.container}>
       <Text style={styles.dateText}>{formattedDate}</Text>

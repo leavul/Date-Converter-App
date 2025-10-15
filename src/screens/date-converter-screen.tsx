@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { CalendarTypePanel } from "../components/calendar-type-panel";
@@ -7,8 +6,8 @@ import { DatePickerPanel } from "../components/date-picker-panel";
 import {
   resetToToday,
   set_date_part,
-  toggle_calender_type,
-} from "../redux/calender-slice";
+  toggle_calendar_type,
+} from "../redux/calendar-slice";
 import type { RootState } from "../redux/store";
 import {
   getDateParts,
@@ -19,34 +18,50 @@ import {
   getYearOptions,
 } from "../services/calendar-service";
 
+// Calculate Hijri and Gregorian year options only once
+const hijriYearOptions = getYearOptions({ calendarTypeIsHijri: true });
+const gregorianYearOptions = getYearOptions({ calendarTypeIsHijri: false });
+
 export default function DateConverterScreen() {
-  const { date, calendarTypeIsHijri } = useSelector(
-    (state: RootState) => state.calender
+  const { selectedDate, calendarTypeIsHijri } = useSelector(
+    (state: RootState) => state.calendar
   );
   const dispatch = useDispatch();
 
-  const { year, month, day } = getDateParts(date, calendarTypeIsHijri);
-  const [resetSignal, setResetSignal] = useState(0);
+  // Get current year, month, and day from the Redux date (returned by helper function)
+  const { year, month, day } = getDateParts({
+    date: selectedDate,
+    calendarTypeIsHijri: calendarTypeIsHijri,
+  });
 
-  const hijriYearOptions = getYearOptions(true);
-  const gregorianYearOptions = getYearOptions(false);
-
+  // Select year options based on currently chosen calendar type
   const yearOptions = calendarTypeIsHijri
     ? hijriYearOptions
     : gregorianYearOptions;
+  // Month and day picker options
   const monthOptions = getMonthOptions();
-  const dayOptions = getDayOptions(calendarTypeIsHijri, date);
+  // Day picker options
+  const dayOptions = getDayOptions({
+    calendarTypeIsHijri: calendarTypeIsHijri,
+    date: selectedDate,
+  });
 
-  const weekdayName = getDayWeekName(date);
-  const formattedDate = getFormattedDate(date, calendarTypeIsHijri);
+  // Information to display after converting the calendar data
+  const formattedDate = getFormattedDate({
+    date: selectedDate,
+    isFromHijriToGregorian: calendarTypeIsHijri,
+  });
+  const weekdayName = getDayWeekName({ date: selectedDate });
 
   return (
     <View style={styles.container}>
+      {/* Calendar type toggle */}
       <CalendarTypePanel
-        onToggleCalenderTypePress={() => dispatch(toggle_calender_type())}
         fromHijriToGregorian={calendarTypeIsHijri}
+        onToggleCalendarTypePress={() => dispatch(toggle_calendar_type())}
       />
 
+      {/* Date pickers */}
       <DatePickerPanel
         year={year}
         month={month}
@@ -54,19 +69,16 @@ export default function DateConverterScreen() {
         yearOptions={yearOptions}
         monthOptions={monthOptions}
         dayOptions={dayOptions}
-        resetSignal={resetSignal}
         onChangeDatePart={(part, value) =>
           dispatch(set_date_part({ part, value }))
         }
-        onResetToToday={() => {
-          dispatch(resetToToday());
-          setResetSignal((prev) => prev + 1);
-        }}
+        onResetToToday={() => dispatch(resetToToday())}
       />
 
+      {/* Converted date card */}
       <ConvertedDateCard
-        weekdayName={weekdayName}
         formattedDate={formattedDate}
+        weekdayName={weekdayName}
       />
     </View>
   );

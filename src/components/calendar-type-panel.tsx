@@ -1,18 +1,14 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-type CalendarTypePanelProps = {
-  onToggleCalenderTypePress: () => void;
-  fromHijriToGregorian: boolean;
-};
-
-function CalendarTypeBox({
-  label,
-  type,
-}: {
+// Props for the calendar type box
+interface CalendarTypeBoxProps {
   label: "To" | "From";
-  type: string;
-}) {
+  type: "Hijri" | "Gregorian";
+}
+
+// Small box showing a label ("From"/"To") and the calendar type ("Hijri"/"Gregorian")
+function CalendarTypeBox({ label, type }: CalendarTypeBoxProps) {
   return (
     <View style={styles.calendarTypeBox}>
       <Text style={styles.labelText}>{label}:</Text>
@@ -21,27 +17,38 @@ function CalendarTypeBox({
   );
 }
 
+// Props for the calendar type panel
+interface CalendarTypePanelProps {
+  fromHijriToGregorian: boolean;
+  onToggleCalendarTypePress: () => void;
+}
+
+// Panel with "From" and "To" boxes and a button to toggle calendar type
 export function CalendarTypePanel({
-  onToggleCalenderTypePress,
   fromHijriToGregorian,
+  onToggleCalendarTypePress,
 }: CalendarTypePanelProps) {
   return (
     <View style={styles.container}>
+      {/* Box displaying the "From" calendar type */}
       <CalendarTypeBox
         label="From"
         type={fromHijriToGregorian ? "Hijri" : "Gregorian"}
       />
+
+      {/* Toggle button (swapping calendar type) */}
       <TouchableOpacity
         style={styles.toggleButton}
-        activeOpacity={0.8}
-        onPress={onToggleCalenderTypePress}
-      >
+        activeOpacity={0.65}
+        onPress={onToggleCalendarTypePress}>
         <MaterialCommunityIcons
           name="swap-horizontal"
           size={40}
           color="#ffdeb0ff"
         />
       </TouchableOpacity>
+
+      {/* Box displaying the "To" calendar type */}
       <CalendarTypeBox
         label="To"
         type={fromHijriToGregorian ? "Gregorian" : "Hijri"}

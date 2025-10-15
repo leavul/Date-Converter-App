@@ -2,14 +2,16 @@ import type { PickerItem } from "@quidone/react-native-wheel-picker";
 import WheelPicker from "@quidone/react-native-wheel-picker";
 import { StyleSheet, Text, View } from "react-native";
 
-type CustomWheelPickerProps = {
+// Props for the custom wheel picker
+interface CustomWheelPickerProps {
   label: string;
   options: PickerItem<number>[];
   selectedOption: number;
   onChangeDate: (value: number) => void;
   extraValues: [number];
-};
+}
 
+// Custom wheel picker component
 export function CustomWheelPicker({
   label,
   options,
@@ -26,6 +28,10 @@ export function CustomWheelPicker({
         visibleItemCount={5}
         data={options}
         value={selectedOption}
+        // If try to set new value while the picker wheels are moving,
+        // the pickers won’t respond because of the package behavior.
+        // So, following the package instructions, this value forces the pickers
+        // to reset and set the new value when something like that issue happens.
         extraValues={extraValues}
         onValueChanged={({ item: { value } }) => onChangeDate(value)}
         enableScrollByTapOnItem={true}
