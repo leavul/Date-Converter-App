@@ -1,6 +1,6 @@
 # Date Converter App 📅
 
-Simple app to convert dates between Gregorian and Hijri calendars.
+Simple app to convert dates between Hijri and Gregorian calendars.
 
 ## Tech Stack
 
